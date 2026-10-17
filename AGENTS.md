@@ -1,3 +1,16 @@
+# Overview 
+
+This is my personal website.
+
+## Old sites references
+
+In refs/ there should be two folders:
+
+- chielorenz.com: contains the source of the old version of my website I want to port. Live and public at https://chielorenz.com/.
+- undiscover: my 'music reviews' website source code. Live and public at https://undiscover.it/.
+
+If these folders are missing instruct the user to pull them from Guthub.
+
 ## Project Configuration
 
 - **Language**: TypeScript

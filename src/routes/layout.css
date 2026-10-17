@@ -1,1 +1,92 @@
+@import '#lib/assets/fonts.css';
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+/* Explicit choices override the OS; system mode stays entirely CSS-driven. */
+@custom-variant dark {
+	&:where([data-theme-mode="dark"], [data-theme-mode="dark"] *) { @slot; }
+	@media (prefers-color-scheme: dark) {
+		&:where(:root:not([data-theme-mode="light"]), :root:not([data-theme-mode="light"]) *) { @slot; }
+	}
+}
+@custom-variant light {
+	&:where([data-theme-mode="light"], [data-theme-mode="light"] *) { @slot; }
+	@media (prefers-color-scheme: light) {
+		&:where(:root:not([data-theme-mode="dark"]), :root:not([data-theme-mode="dark"]) *) { @slot; }
+	}
+}
+@custom-variant glyphs (&:where(.glyphs, .glyphs *));
+@custom-variant no-glyphs (&:where(.no-glyphs, .no-glyphs *));
+
+@theme {
+	--font-sans: 'Outfit Variable', sans-serif;
+	/* Preserve the original Tailwind 3 neutral palette. */
+	--color-neutral-100: #f5f5f5;
+	--color-neutral-800: #262626;
+	--color-neutral-900: #171717;
+}
+
+@layer base {
+	body { @apply isolate bg-white text-black dark:bg-neutral-900 dark:text-white; }
+	button { cursor: pointer; }
+	:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+}
+
+@utility link {
+	text-decoration-line: underline;
+	text-underline-offset: 4px;
+	text-decoration-style: solid;
+	text-decoration-thickness: 1px;
+	text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+	&:hover, &:focus-visible {
+		text-decoration-color: color-mix(in srgb, currentColor 80%, transparent);
+	}
+}
+
+/* Override typography's utility layer, including its default dark pre background. */
+.prose {
+	--tw-prose-pre-bg: rgb(245 245 245 / 90%);
+	--tw-prose-pre-code: var(--tw-prose-body);
+	--tw-prose-invert-pre-bg: rgb(38 38 38 / 90%);
+	--tw-prose-invert-pre-code: var(--tw-prose-invert-body);
+	@variant dark {
+		--tw-prose-pre-bg: var(--tw-prose-invert-pre-bg);
+		--tw-prose-pre-code: var(--tw-prose-invert-pre-code);
+	}
+}
+
+.prose a { @apply link; }
+
+/* Shiki emits both palettes as CSS variables; the active theme selects one. */
+.prose pre.shiki code {
+	display: block;
+	overflow-x: auto;
+	padding: 1em;
+}
+.shiki, .shiki span {
+	color: var(--shiki-light);
+	font-style: var(--shiki-light-font-style, normal);
+	font-weight: var(--shiki-light-font-weight, normal);
+	text-decoration: var(--shiki-light-text-decoration, none);
+	@variant dark {
+		color: var(--shiki-dark);
+		font-style: var(--shiki-dark-font-style, normal);
+		font-weight: var(--shiki-dark-font-weight, normal);
+		text-decoration: var(--shiki-dark-text-decoration, none);
+	}
+}
+
+.glyph {
+	position: fixed;
+	opacity: 0.25;
+	width: 16px;
+	height: 16px;
+	z-index: -1;
+	animation: wander var(--glyph-duration) ease infinite;
+}
+@keyframes wander {
+	0%, 100% { transform: translate(0, 0) rotate(0); }
+	50% { transform: translate(var(--glyph-x), var(--glyph-y)) rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+	.glyph { animation: none; }
+}

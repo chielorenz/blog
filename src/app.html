@@ -2,8 +2,42 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="color-scheme" content="light dark" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<!-- Paint the theme background even before the external stylesheet loads. -->
+		<style>
+			:root {
+				color-scheme: light;
+				background-color: #fff;
+				color: #000;
+			}
+			:root[data-theme-mode="dark"] {
+				color-scheme: dark;
+				background-color: #171717;
+				color: #fff;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root:not([data-theme-mode="light"]) {
+					color-scheme: dark;
+					background-color: #171717;
+					color: #fff;
+				}
+			}
+		</style>
+		<script>
+			(() => {
+				let mode = 'system';
+				let glyphs = true;
+				try {
+					const saved = localStorage.getItem('theme-mode');
+					if (saved === 'light' || saved === 'dark') mode = saved;
+					glyphs = localStorage.getItem('theme-glyphs') !== 'false';
+				} catch {}
+				document.documentElement.dataset.themeMode = mode;
+				document.documentElement.classList.add(glyphs ? 'glyphs' : 'no-glyphs');
+			})();
+		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
