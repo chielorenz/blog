@@ -5,9 +5,7 @@
 		description = 'Personal website',
 		path = '/',
 		type = 'website',
-		image = '/og.png',
-		imageWidth = 1200,
-		imageHeight = 630
+		image = '/og.png'
 	}: {
 		title: string;
 		ogTitle?: string;
@@ -15,8 +13,6 @@
 		path?: string;
 		type?: 'website' | 'article';
 		image?: string;
-		imageWidth?: number;
-		imageHeight?: number;
 	} = $props();
 </script>
 
@@ -28,6 +24,8 @@
 	<meta property="og:url" content="https://chielorenz.com{path}" />
 	<meta property="og:type" content={type} />
 	<meta property="og:image" content="https://chielorenz.com{image}" />
-	<meta property="og:image:width" content={String(imageWidth)} />
-	<meta property="og:image:height" content={String(imageHeight)} />
+	{#if image === '/og.png'}
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+	{/if}
 </svelte:head>

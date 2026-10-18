@@ -6,6 +6,7 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { enhancedImages } from '@sveltejs/enhanced-img';
 import { splitFrontmatter } from './src/lib/server/frontmatter.js';
+import { markdownPlayer } from './src/lib/server/markdown-player.js';
 
 async function highlightCode(code: string, language?: string | null) {
 	const lang = language && Object.hasOwn(bundledLanguages, language) ? language : 'text';
@@ -14,7 +15,9 @@ async function highlightCode(code: string, language?: string | null) {
 		themes: { light: 'github-light', dark: 'github-dark-dimmed' },
 		defaultColor: false
 	});
-	return escapeSvelte(html);
+	// Shiki's tabindex lets keyboard users focus and scroll overflowing code blocks.
+	return '<!-- svelte-ignore a11y_no_noninteractive_tabindex (Code blocks support keyboard scrolling.) -->\n'
+		+ escapeSvelte(html);
 }
 
 export default defineConfig({
@@ -36,7 +39,7 @@ export default defineConfig({
 			}, mdsvex({
 				extensions: ['.svx', '.md'],
 				highlight: { highlighter: highlightCode }
-			})],
+			}), markdownPlayer],
 			extensions: ['.svelte', '.svx', '.md']
 		})
 	]

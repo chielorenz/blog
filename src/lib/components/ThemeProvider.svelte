@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { themeKey, isDark, nextMode, type Mode, type Theme } from '#lib/theme.js';
+	import { setTheme, isDark, nextMode, type Mode } from '#lib/theme.js';
 	let { children }: { children: Snippet } = $props();
 	let mode: Mode = 'system';
 	let glyphs = $state(true);
@@ -43,6 +43,6 @@
 		};
 	});
 
-	setContext<Theme>(themeKey, { get glyphs() { return glyphs; }, toggleMode, toggleGlyphs });
+	setTheme({ get glyphs() { return glyphs; }, toggleMode, toggleGlyphs });
 </script>
 {@render children()}

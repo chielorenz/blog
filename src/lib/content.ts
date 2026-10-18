@@ -1,23 +1,23 @@
-export interface ArticleMetadata {
+import type { PlayerConfig } from './player.js';
+
+interface BaseMetadata {
 	title: string;
-	excerpt: string;
 	timestamp: string;
 	published: boolean;
-	type: 'article';
 }
 
-export interface AlbumMetadata extends Omit<ArticleMetadata, 'type'> {
+export interface ArticleMetadata extends BaseMetadata {
+	type: 'article';
+	excerpt: string;
+}
+
+export interface AlbumMetadata extends BaseMetadata {
 	type: 'album';
 	artist: string;
 	album: string;
-	label: string;
-	releaseYear: number;
 	duration: number;
-	color: string;
 	cover: string;
-	coverWidth: number;
-	coverHeight: number;
-	player: { provider: 'bandcamp' | 'spotify'; albumId: string };
+	player: PlayerConfig;
 }
 
 export type ContentMetadata = ArticleMetadata | AlbumMetadata;

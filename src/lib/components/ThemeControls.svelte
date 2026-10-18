@@ -1,7 +1,6 @@
 <script lang="ts">
- import { getContext } from 'svelte';
- import { themeKey, type Theme } from '#lib/theme.js';
- const theme = getContext<Theme>(themeKey);
+	import { getTheme } from '#lib/theme.js';
+	const theme = getTheme();
 </script>
 <div class="flex items-center gap-4">
  <button type="button" onclick={theme.toggleMode} aria-label="Toggle light/dark mode" title="Toggle light/dark mode">

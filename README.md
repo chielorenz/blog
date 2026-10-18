@@ -6,24 +6,14 @@
 pnpm install
 pnpm dev
 pnpm check
+pnpm test
 pnpm build
 pnpm preview
 ```
 
-## Static port
-
-The site uses Svelte 5, SvelteKit, Tailwind CSS, and mdsvex. Run `pnpm dev` to develop,
-and `pnpm check` for type and accessibility checks.
-`pnpm build` generates the complete static website in `build/`; `pnpm preview` serves it locally.
-
-All published content lives in `src/content/*.md`. Every entry declares `title`,
-`excerpt`, `timestamp`, and `published` in frontmatter.
-Keep drafts in `src/content/drafts/`, which is excluded from public bundles. To
-publish a draft, move it into `src/content/` and set `published: true`.
-
 ## Writing posts
 
-For example, create `src/content/cooking-with-my-laptop.md`:
+For example, create `src/posts/cooking-with-my-laptop/index.md`:
 
 ```markdown
 ---
@@ -37,6 +27,20 @@ published: true
 
 Write the post here.
 ```
+
+Place media alongside `index.md` and import it using a relative path. For example,
+with `photo.png` in the same folder, add this after the frontmatter:
+
+```svelte
+<script>
+  import photo from './photo.png';
+</script>
+
+<img src={photo} alt="My laptop cooking experiment" />
+```
+
+Vite copies imported media into the build and generates their public URLs.
+Use the same relative imports for audio, video, or downloadable files.
 
 Rebuild with `pnpm build`. This generates `/blog/cooking-with-my-laptop` and adds
 it to the single chronological post list at `/blog`.
@@ -67,9 +71,9 @@ The font's redistribution license is included at `static/fonts/Outfit-OFL.txt`.
 
 ## Albums
 
-The nine published Undiscover reviews live alongside other posts in `src/content/`,
-with `type: album`. Their cover files remain in
-`src/lib/assets/albums/<slug>/cover.jpeg`. Reviews render at `/blog/<slug>` and their
+Album reviews live alongside other posts in `src/posts/<slug>/index.md`,
+with `type: album`. Their cover files live alongside the Markdown at
+`src/posts/<slug>/cover.jpeg`. Reviews render at `/blog/<slug>` and their
 Markdown components load individually. The post index shows the listening
 duration with one headphone emoji per complete ten minutes.
 
@@ -77,22 +81,52 @@ The post list uses `@sveltejs/enhanced-img` to generate AVIF, WebP, and JPEG
 thumbnails at 80, 112, 160, and 224 pixels wide during the build. Responsive
 sources match the 80px mobile and 112px desktop covers, including retina displays.
 The first cover loads eagerly with high priority; remaining covers load lazily.
-Keep originals at `src/lib/assets/albums/<slug>/cover.jpeg`; they also serve social previews
-through Vite-generated asset URLs. The frontmatter `cover` field remains
-`/albums/<slug>/cover.jpeg`, relative to `src/lib/assets`.
+Keep originals at `src/posts/<slug>/cover.jpeg`; they also serve social previews
+through Vite-generated asset URLs. Set the frontmatter `cover` field to
+`./cover.jpeg`, relative to the post's `index.md`.
 The first build processes the images; subsequent builds reuse the image cache.
 
-Album frontmatter includes the common fields, plus `type: album`, `artist`, `album`, `label`, `releaseYear`, `duration`, `color`, `cover`,
-`coverWidth`, `coverHeight`, and `player`. The latter contains a `provider`
-(`bandcamp` or `spotify`) and an `albumId` string.
+Album frontmatter includes `type: album`, `artist`, `album`, `timestamp` (date only),
+`published`, `duration`, `cover`, and `player`. The title is generated as
+`artist / album`; albums do not need `title` or `excerpt`. The player contains a `provider`
+(`bandcamp`, `spotify`, or `youtube`) and an `id` string. `player` is required
+for every album and renders below the heading, before the review. For YouTube, `id` holds
+the video ID.
+
+```yaml
+player: { provider: spotify, id: "2V23C4HrEmedy2uevqwIiN" }
+```
+
+Frontmatter and inline players share the same `provider` and `id` fields.
+
+For an album available only on YouTube, use the video's ID from its URL:
+
+```yaml
+player: { provider: youtube, id: "r8qOELxiXd0" }
+```
+
+Add extra players anywhere in an article or album's Markdown body, without imports:
+
+```html
+<player provider="youtube" id="r8qOELxiXd0" title="Generic animal" />
+
+<player provider="spotify" id="2V23C4HrEmedy2uevqwIiN" />
+
+<player provider="bandcamp" id="3440541770" />
+```
+
+Use a YouTube video ID, Spotify album ID, or numeric Bandcamp album ID. `title` is
+optional and labels the iframe for screen readers. Put each player on its own
+line, separated from surrounding Markdown by blank lines. YouTube players keep
+a responsive 16:9 aspect ratio. All players are capped at 700px wide.
 
 `ContentPage.svelte` uses the same prose typography and update date for articles
-and album reviews. Album Markdown files contain only frontmatter and review text;
+and album reviews. Album Markdown files contain frontmatter, review text, and optional inline players;
 the page supplies the artist / album heading. The title is followed
-by review text and the embedded player, capped at 700px wide. Artwork is shown
+by the embedded player, capped at 700px wide, and then the review text. Artwork is shown
 inside the Bandcamp or Spotify player; local covers remain available for social previews. Players use
 official iframe embeds. They depend on
-Bandcamp or Spotify availability; no CMS, API credentials, or backend is required.
+Bandcamp, Spotify, or YouTube availability; no CMS, API credentials, or backend is required.
 
 `/blog` combines all published content in chronological order without tags or filters.
 The homepage links to `/blog`.
